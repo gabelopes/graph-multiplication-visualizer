@@ -1,5 +1,6 @@
 :- module(commons, [
-  number/3,
+  integer/3,
+  natural/3,
   digit/3,
   character_sequence/3,
   character/3,
@@ -16,16 +17,26 @@
 ]).
 
 % Integers
-number(Number) -->
+integer(Number) -->
+  sign(Sign),
+  natural(Natural),
+  { Number is Sign * Natural }.
+
+% Natural
+natural(Number) -->
   { var(Number) },
   digits(Digits),
   { number_chars(Number, Digits) }.
-number(Number) -->
+natural(Number) -->
   {
     nonvar(Number),
     number_chars(Number, Digits)
   },
   digits(Digits).
+
+sign(1) --> "".
+sign(1) --> "+".
+sign(-1) --> "-".
 
 digits([Digit]) --> digit(Digit).
 digits([Digit|Rest]) -->

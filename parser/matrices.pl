@@ -29,9 +29,9 @@ rows(Columns, [Row|Rest]) -->
   spaces,
   rows(Columns, Rest).
 
-row([Number]) --> number(Number).
+row([Number]) --> integer(Number).
 row([Number|Rest]) -->
-  number(Number),
+  integer(Number),
   spaces,
   comma,
   spaces,

@@ -39,7 +39,7 @@ label(Weight) -->
   spaces,
   equals,
   spaces,
-  number(Weight),
+  integer(Weight),
   spaces,
   right_bracket.
 

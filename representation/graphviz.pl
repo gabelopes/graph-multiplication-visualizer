@@ -9,6 +9,8 @@
 :- use_module('../parser/digraphs', [stringify_digraph/2]).
 
 generate_edge(Row, Column, Weight, edge(Head, Tail, Weight)) :-
+  RowIndex is Row - 1, % `collect_elements` generate 1-based row and column indices.
+  ColumnIndex is Column - 1,
   generate_character_sequence(Row, Head),
   generate_character_sequence(Column, Tail).
 

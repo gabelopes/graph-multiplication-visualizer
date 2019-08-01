@@ -1,9 +1,7 @@
-:- use_module(math/permutations).
-:- use_module(math/sets).
+:- use_module(math/matrix).
+:- use_module(parser/matrices).
 
 start :-
-  signed_permute([1, 2, 3, 4], Permutations),
-  length(Permutations, Length),
-  range(1, 1000, Set),
-  writeln(Set),
-  format("|P| = ~w\n~w\n", [Length, Permutations]). 
+  parse_matrix("{ 3, 5, 10, 9, 12; 1, 2, 4, -15, 1; -9, 6, 0, 10, 40; 3, -3, 6, 6, -1; 0, 0, 1, 2, 3 }", Matrix),
+  determinant(Matrix, Determinant),
+  writeln(Determinant). 

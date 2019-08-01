@@ -12,6 +12,8 @@
 
 :- use_module(library(clpfd)).
 :- use_module('../representation/arrays').
+:- use_module(sets).
+:- use_module(permutations).
 
 %%% Mathematical Operations
 % Multiplication
@@ -64,12 +66,12 @@ null(Rows, Columns, Matrix) :-
 
 % Representation
 collect_elements(matrix(_, _, Matrix), List) :-
-  collect_rows(Matrix, 0, ElementsRows),
+  collect_rows(Matrix, 1, ElementsRows),
   append(ElementsRows, List).
 
 collect_rows([], _, []).
 collect_rows([Row|Rest], RowIndex, [Elements|Partial]) :-
-  collect_columns(Row, RowIndex, 0, Elements),
+  collect_columns(Row, RowIndex, 1, Elements),
   NextRowIndex is RowIndex + 1,
   collect_rows(Rest, NextRowIndex, Partial).
 
@@ -100,40 +102,31 @@ generate_columns(Columns, RowIndex, ColumnIndex, Mapper, [Element|Rest]) :-
   generate_columns(Columns, RowIndex, NextColumnIndex, Mapper, Rest).
 
 %% Determinant
-determinant(matrix(2, 2, [[A, B], [C, D]]), Determinant) :-
-  Determinant is A * D - B * C.
-determinant(matrix(Size, Size, Matrix), Determinant) :-
-  determinant_by_minor(matrix(Size, Size, Matrix), Determinant).
+determinant(Matrix, Determinant) :-
+  leibniz_determinant(Matrix, Determinant).
 
-determinant_by_minor(matrix(Size, Size, [Row|Rest]), Determinant) :-
-  determinant_by_minor(matrix(Size, Size, [Row|Rest]), Row, 1, Determinant).
-determinant_by_minor(_, [], _, 0).
-determinant_by_minor(Matrix, [Element|Rest], Index, Determinant) :-
-  NextIndex is Index + 1,
-  determinant_by_minor(Matrix, Rest, NextIndex, PartialDeterminant),
-  minor(Matrix, 1, Index, Minor),
-  determinant(Minor, MinorDeterminant),
-  DeterminantComponent is Element * MinorDeterminant,
-  Determinant is DeterminantComponent + PartialDeterminant.
+leibniz_determinant(matrix(Size, Size, Matrix), Determinant) :-
+  range(1, Size, Set),
+  signed_permute(Set, Permutations),
+  collect_elements(matrix(Size, Size, Matrix), Elements),
+  leibniz_determinant(Permutations, Elements, Determinant).
 
-% Minor
-has_minor(Size, Row, Column) :-
-  Size > 1,
-  Row > 0,
-  Column > 0,
-  Row =< Size,
-  Column =< Size.
+leibniz_determinant([], _, 0).
+leibniz_determinant([permutation(Permutation, Sign)|Rest], Elements, Determinant) :-
+  leibniz_determinant(Rest, Elements, PartialDeterminant),
+  leibniz_product(Elements, Permutation, Product),
+  Determinant is Sign * Product + PartialDeterminant.
 
-minor(matrix(Size, Size, Matrix), Row, Column, matrix(MinorSize, MinorSize, Minor)) :-
-  has_minor(Size, Row, Column),
-  MinorSize is Size - 1,
-  remove_row(Matrix, Row, PartialMinor),
-  remove_column(PartialMinor, Column, Minor).
+leibniz_product(Elements, Permutation, Product) :-
+  leibniz_product(Elements, 1, Permutation, Product).
+leibniz_product(_, _, [], 1).
+leibniz_product(Elements, Row, [Column|Rest], Product) :-
+  NextRow is Row + 1,
+  leibniz_product(Elements, NextRow, Rest, PartialProduct),
+  element_at(Elements, Row, Column, Element),
+  Product is Element * PartialProduct.
 
-remove_row(Matrix, Row, Result) :-
-  remove_element(Matrix, Row, Result).
-
-remove_column([], _, []).
-remove_column([Row|Rest], Column, [MinorRow|Partial]) :-
-  remove_element(Row, Column, MinorRow),
-  remove_column(Rest, Column, Partial).
+element_at([], _, _, _) :- fail.
+element_at([element(Row, Column, Element)|_], Row, Column, Element).
+element_at([_|Rest], Row, Column, Element) :-
+  element_at(Rest, Row, Column, Element).
