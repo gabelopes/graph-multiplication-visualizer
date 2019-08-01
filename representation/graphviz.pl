@@ -4,9 +4,9 @@
   create_digraph_image/3
 ]).
 
-:- use_module(matrix, [collect_elements/2]).
-:- use_module(representation/characters, [generate_character_sequence/2]).
-:- use_module(parser/digraphs, [stringify_digraph/2]).
+:- use_module('../math/matrix', [collect_elements/2]).
+:- use_module(characters, [generate_character_sequence/2]).
+:- use_module('../parser/digraphs', [stringify_digraph/2]).
 
 generate_edge(Row, Column, Weight, edge(Head, Tail, Weight)) :-
   generate_character_sequence(Row, Head),

@@ -6,10 +6,12 @@
   null/3,
   collect_elements/2,
   generate_matrix/3,
-  generate_matrix/4
+  generate_matrix/4,
+  determinant/2
 ]).
 
 :- use_module(library(clpfd)).
+:- use_module('../representation/arrays').
 
 %%% Mathematical Operations
 % Multiplication
@@ -96,3 +98,42 @@ generate_columns(Columns, RowIndex, ColumnIndex, Mapper, [Element|Rest]) :-
   apply(Mapper, [RowIndex, ColumnIndex, Element]),
   NextColumnIndex is ColumnIndex + 1,
   generate_columns(Columns, RowIndex, NextColumnIndex, Mapper, Rest).
+
+%% Determinant
+determinant(matrix(2, 2, [[A, B], [C, D]]), Determinant) :-
+  Determinant is A * D - B * C.
+determinant(matrix(Size, Size, Matrix), Determinant) :-
+  determinant_by_minor(matrix(Size, Size, Matrix), Determinant).
+
+determinant_by_minor(matrix(Size, Size, [Row|Rest]), Determinant) :-
+  determinant_by_minor(matrix(Size, Size, [Row|Rest]), Row, 1, Determinant).
+determinant_by_minor(_, [], _, 0).
+determinant_by_minor(Matrix, [Element|Rest], Index, Determinant) :-
+  NextIndex is Index + 1,
+  determinant_by_minor(Matrix, Rest, NextIndex, PartialDeterminant),
+  minor(Matrix, 1, Index, Minor),
+  determinant(Minor, MinorDeterminant),
+  DeterminantComponent is Element * MinorDeterminant,
+  Determinant is DeterminantComponent + PartialDeterminant.
+
+% Minor
+has_minor(Size, Row, Column) :-
+  Size > 1,
+  Row > 0,
+  Column > 0,
+  Row =< Size,
+  Column =< Size.
+
+minor(matrix(Size, Size, Matrix), Row, Column, matrix(MinorSize, MinorSize, Minor)) :-
+  has_minor(Size, Row, Column),
+  MinorSize is Size - 1,
+  remove_row(Matrix, Row, PartialMinor),
+  remove_column(PartialMinor, Column, Minor).
+
+remove_row(Matrix, Row, Result) :-
+  remove_element(Matrix, Row, Result).
+
+remove_column([], _, []).
+remove_column([Row|Rest], Column, [MinorRow|Partial]) :-
+  remove_element(Row, Column, MinorRow),
+  remove_column(Rest, Column, Partial).

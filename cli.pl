@@ -2,8 +2,8 @@
 
 :- use_module(parser/digraphs).
 :- use_module(parser/matrices).
-:- use_module(matrix).
-:- use_module(graphviz).
+:- use_module(math/matrix).
+:- use_module(representation/graphviz).
 
 specification([
   [opt('command'), shortflags(['c']), longflags(['command']), type(atom)],
