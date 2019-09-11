@@ -2,6 +2,8 @@
 :- use_module(parser/matrices).
 
 start :-
-  parse_matrix("{ 3, 5, 10, 9, 12; 1, 2, 4, -15, 1; -9, 6, 0, 10, 40; 3, -3, 6, 6, -1; 0, 0, 1, 2, 3 }", Matrix),
-  determinant(Matrix, Determinant),
-  writeln(Determinant). 
+  parse_matrix("{ -5, 4; -1, 0 }", MatrixA),
+  parse_matrix("{ 0, 1; 1, 1 }", MatrixB),
+  multiply(MatrixA, MatrixB, MatrixC),
+  stringify_matrix(MatrixC, S),
+  writeln(S). 

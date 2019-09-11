@@ -11,8 +11,8 @@
 generate_edge(Row, Column, Weight, edge(Head, Tail, Weight)) :-
   RowIndex is Row - 1, % `collect_elements` generate 1-based row and column indices.
   ColumnIndex is Column - 1,
-  generate_character_sequence(Row, Head),
-  generate_character_sequence(Column, Tail).
+  generate_character_sequence(RowIndex, Head),
+  generate_character_sequence(ColumnIndex, Tail).
 
 generate_edges([], []).
 generate_edges([element(_, _, 0)|ElementsRest], Edges) :-

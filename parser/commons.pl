@@ -18,9 +18,27 @@
 
 % Integers
 integer(Number) -->
+  { var(Number) },
   sign(Sign),
-  natural(Natural),
-  { Number is Sign * Natural }.
+  digits(Digits),
+  {
+    number_chars(Natural, Digits),
+    Number is Sign * Natural
+  }.
+integer(Number) -->
+  {
+    nonvar(Number),
+    Sign is sign(Number),
+    digits_chars(Number, Digits)
+  },
+  sign(Sign),
+  digits(Digits).
+
+digits_chars(Number, Chars) :-
+  Number >= 0,
+  number_chars(Number, Chars).
+digits_chars(Number, Chars) :-
+  number_chars(Number, [_|Chars]).
 
 % Natural
 natural(Number) -->
@@ -37,6 +55,7 @@ natural(Number) -->
 sign(1) --> "".
 sign(1) --> "+".
 sign(-1) --> "-".
+sign(0) --> "".
 
 digits([Digit]) --> digit(Digit).
 digits([Digit|Rest]) -->
